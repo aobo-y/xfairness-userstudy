@@ -1,0 +1,38 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.12.1",
+    "lodash": "^4.17.11",
+    "mathjs": "^5.4.0",
+    "query-string": "^6.2.0",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-scripts": "2.1.2",
+    "shortid": "^2.2.14",
+    "tinyqueue": "^2.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "homepage": "https://aobo-y.github.io/xrecommendation-userstudy/",
+  "devDependencies": {
+    "gh-pages": "^2.0.1",
+    "yelp-fusion": "^2.2.1"
+  }
+}
