@@ -4,7 +4,7 @@ import {
   Modal, Form, Radio, Button, Select
 } from 'antd';
 
-import scenarios from '../lib/scenarios';
+import datasets from '../lib/dataset';
 
 class ContextModal extends PureComponent {
   static propTypes = {
@@ -13,31 +13,24 @@ class ContextModal extends PureComponent {
   }
 
   state = {
-    dataset: 'yelp',
-    scenario: 0
+    dataset_key: 'yelp',
   }
 
-  onDatasetChange = e => {
-    this.setState({ dataset: e.target.value });
-  }
-
-  onScenarioChange = v => {
-    this.setState({ scenario: v });
+  onDatasetChange = v => {
+    this.setState({ dataset_key: v });
   }
 
   onSubmit = () => {
     this.props.onSubmit({...this.state});
   }
 
-  mapScenarioToStr = (scenario) => {
-    return scenario.map(step =>  {
-      return step.model + (step.random ? ' (random explanation)' : '');
-    }).join(' vs ');
+  mapDatasetKeyToLabel = (dataset_key) => {
+    return dataset_key.replace('_', ' ');
   }
 
   render() {
     const { visible } = this.props;
-    const { dataset, scenario } = this.state;
+    const { dataset_key } = this.state;
 
     return (
       <Modal
@@ -47,26 +40,18 @@ class ContextModal extends PureComponent {
         closable={false}
       >
         <Form>
+
           <Form.Item
             label="Dataset"
           >
-            <Radio.Group value={dataset} onChange={this.onDatasetChange}>
-              <Radio.Button value="amazon">Amazon</Radio.Button>
-              <Radio.Button value="yelp">Yelp</Radio.Button>
-            </Radio.Group>
-          </Form.Item>
-
-          <Form.Item
-            label="Scenario"
-          >
             <Select
-              value={scenario}
-              onChange={this.onScenarioChange}
+              value={dataset_key}
+              onChange={this.onDatasetChange}
               style={{width: 280}}
             >
               {
-                scenarios.map((s, idx) => (
-                  <Select.Option key={idx} value={idx}>{idx}. {this.mapScenarioToStr(s)}</Select.Option>
+                Object.keys(datasets).map((v, idx) => (
+                  <Select.Option key={v} value={v}>{idx}. {this.mapDatasetKeyToLabel(v)}</Select.Option>
                 ))
               }
             </Select>

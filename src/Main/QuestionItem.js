@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
+import { Card, Tag, Radio, Button, Collapse, Icon, Row, Col } from 'antd';
 
 import InputSlider from './InputSlider';
 
@@ -54,81 +54,124 @@ const RadioAnswer = ({
   );
 }
 
+
+const Item = ({
+  id,
+  name,
+  metadata,
+  exp,
+  review,
+}) => {
+  return (
+    <Card title={name}>
+      {
+        metadata.map((tag, idx) =>
+          <Tag key={idx} color="blue" style={{marginBottom: 6}}>
+            {tag}
+          </Tag>
+        )
+      }
+      {
+        Boolean(exp) && (
+          <Collapse defaultActiveKey={["1"]} bordered={false}>
+            <Collapse.Panel
+              key="1"
+              header={<><Icon type="solution" style={{ marginRight: 8 }} />Explanation</>}
+              style={{border: 0}}
+            >
+              <p>{`This item is recommended because: ${exp}`}</p>
+            </Collapse.Panel>
+          </Collapse>
+        )
+      }
+      {
+        Boolean(review) && (
+          <Collapse defaultActiveKey={["1"]} bordered={false}>
+            <Collapse.Panel
+              key="1"
+              header={<><Icon type="solution" style={{ marginRight: 8 }} />User Review</>}
+              style={{border: 0}}
+            >
+              <p>{review}</p>
+            </Collapse.Panel>
+          </Collapse>
+        )
+      }
+    </Card>
+  )
+}
+
 class QuestionItem extends PureComponent {
   static propTypes = {
     id: PropTypes.number.isRequired,
-    feature: PropTypes.string.isRequired,
-    question: PropTypes.string,
-    splitValue: PropTypes.number,
-    submitted: PropTypes.bool,
-    onSubmit: PropTypes.func
+    items: PropTypes.arrayOf(PropTypes.object).isRequired,
+    choice: PropTypes.number,
+    rating: PropTypes.number,
+    onChoiceChange: PropTypes.func,
+    onRatingChange: PropTypes.func,
   }
 
   static defaultProps = {
-    question: null,
-    splitValue: null,
-    submitted: false
+    choice: null,
+    rating: null
   }
 
-  state = {
-    value: 50,
-    submitted: false
+  onChoiceChange = e => {
+    const {id, onChoiceChange} = this.props;
+    onChoiceChange(id, e.target.value)
   }
 
-  onChange = (value) => {
-    this.setState({
-      value: value,
-    });
-  }
-
-  onConfirm = () => {
-    this.props.onSubmit(this.state.value);
-  }
-
-  onUnknown = () => {
-    this.setState({
-      value: -1
-    });
-    this.props.onSubmit(-1);
-  }
-
-  onLike = () => {
-    this.setState({
-      value: 100
-    });
-    this.props.onSubmit(100);
-  }
-
-  onDislike = () => {
-    this.setState({
-      value: 0
-    });
-    this.props.onSubmit(0);
+  onRatingChange = e => {
+    const {id, onRatingChange} = this.props;
+    onRatingChange(id, e.target.value)
   }
 
   render() {
-    const {id, feature, submitted, splitValue, question} = this.props;
-    const { value } = this.state;
+    const {id, items, choice, rating} = this.props;
 
     return (
       <>
-        <p>Q{id}. {question || `How much do you like ${feature}?`}</p>
-        {
-          splitValue ?
-            <SliderAnswer
-              value={value}
-              submitted={submitted}
-              onChange={this.onChange}
-              onConfirm={this.onConfirm}
-              onUnknown={this.onUnknown}
-            /> :
-            <RadioAnswer
-              value={value}
-              submitted={submitted}
-              onLike={this.onLike}
-              onDislike={this.onDislike}
-              onUnknown={this.onUnknown}
+        <p>Q{id + 1}. Please compare the 2 items recommended below and read the explanations of why they are recommended. Then you will asked to choose one of them based your preference.</p>
+        <Row gutter={24} style={{marginBottom: 16}}>
+          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+            <Item
+              id={items[0].id}
+              name={items[0].name}
+              metadata={items[0].metadata}
+              exp={items[0].exp}
+              review={choice !== null ? items[0].review : null}
             />
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+            <Item
+              id={items[1].id}
+              name={items[1].name}
+              metadata={items[1].metadata}
+              exp={items[1].exp}
+              review={choice !== null ? items[1].review : null}
+            />
+          </Col>
+        </Row>
+
+        <div style={{marginBottom: 16}}>
+          <p>Choose the item you like more:</p>
+          <Radio.Group onChange={this.onChoiceChange} value={choice}>
+            <Radio.Button value={0}>1. {items[0].name}</Radio.Button>
+            <Radio.Button value={1}>2. {items[1].name}</Radio.Button>
+          </Radio.Group>
+        </div>
+
+        {
+          choice !== null && <div style={{marginBottom: 16}}>
+            <p>Now, each item is given an additional user review. After reading the reviews, do you think the explanations help you make the right choice:</p>
+            <Radio.Group onChange={this.onRatingChange} value={rating}>
+              <Radio.Button value={5}>Yes</Radio.Button>
+              <Radio.Button value={4}>Somewhat Yes</Radio.Button>
+              <Radio.Button value={3}>Neutral</Radio.Button>
+              <Radio.Button value={2}>Somewhat No</Radio.Button>
+              <Radio.Button value={1}>No</Radio.Button>
+            </Radio.Group>
+          </div>
         }
       </>
     );

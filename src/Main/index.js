@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import React, { PureComponent } from 'react';
 // import PropTypes from 'prop-types';
 import qs from 'query-string';
@@ -9,32 +10,26 @@ import {
   Row,
   Col,
   Alert,
-  Steps
 } from 'antd';
 
-import QuestionList from './QuestionList';
-import ItemList from './ItemList';
+// import QuestionList from './QuestionList';
+// import ItemList from './ItemList';
 import ContextModal from './ContextModal';
-import SurveyModal from './SurveyModal';
+import Survey from './Survey';
+import ParticipantInfo from './ParticipantInfo';
+// import SurveyModal from './SurveyModal';
 
-import userTree from '../lib/user';
-import itemTree from '../lib/item';
-import scenarios from '../lib/scenarios';
-import { getSurvey } from '../lib/surveys';
+import datasets from '../lib/dataset';
 
 import styles from './index.module.css';
 
-const ITEM_NUM = 5;
+const QUESTION_NUM = 2;
 
 class Main extends PureComponent {
   state = {
-    userNodes: [],
-    itemNodes: [],
     context: null,
     survey: null,
-    expExpanded: false,
-    step: -1,
-    stepEnd: false
+    submitted: false,
   }
 
   componentDidMount() {
@@ -42,25 +37,30 @@ class Main extends PureComponent {
   }
 
   setContext = () => {
-    let {dataset, scenario} = qs.parse(window.location.search);
+    let {dataset_key} = qs.parse(window.location.search);
 
-    if (this.verifyContext(dataset, scenario)) {
-      scenario = Number(scenario);
+    if (dataset_key && dataset_key in datasets) {
+      const dataset = datasets[dataset_key];
+      const pairs = _.sampleSize(dataset, QUESTION_NUM);
+      const survey = {
+        mturk_id: null,
+        gender: null,
+        duration: null,
+        questions: pairs.map((items, idx) => ({
+          items,
+          choice: null,
+          rating: null
+        }))
+      }
 
       this.setState({
-        context: {dataset, scenario}
+        context: {dataset_key},
+        survey,
       }, () => {
-        this.resetStepContext(0);
         this.showWarning();
         this.startTime = new Date();
       });
     }
-  }
-
-  verifyContext = (dataset, scenario) => {
-    if (!['amazon', 'yelp'].includes(dataset)) return false;
-    if (!scenario || !scenarios[Number(scenario)]) return false;
-    return true;
   }
 
   onContextSubmit = context => {
@@ -68,90 +68,51 @@ class Main extends PureComponent {
     this.setContext();
   }
 
-  resetStepContext = (step) => {
-    const { dataset, scenario } = this.state.context;
-
-    const { model, random } = scenarios[scenario][step];
-
-    userTree.setContext(dataset, model);
-    itemTree.setContext(dataset, model, random);
-
+  onSurveyChange = (key, value) => {
+    const {survey} = this.state;
+    _.set(survey, key, value)
     this.setState({
-      userNodes: [userTree.getRoot()],
-      itemNodes: [],
-      step,
-      stepEnd: false
-    });
+      survey: {...survey}
+    }, () => {
+      this.verifySurvey();
+    })
   }
 
-  onSubmit = (nodeId, value) => {
-    const newNode = userTree.nextNode(nodeId, value);
-    const { userNodes } = this.state;
-
-    userNodes[userNodes.length - 1] = {
-      ...userNodes[userNodes.length - 1],
-      submitted: true
-    };
-
-    this.setState({
-      userNodes: newNode.isLeaf ? [...userNodes] : [...userNodes, newNode],
-      itemNodes: itemTree.getTopKItems(newNode.vector, ITEM_NUM)
-    });
-
-    if (newNode.isLeaf) {
-      this.showNotification();
-      this.setState({
-        stepEnd: true
-      })
-    }
-  }
-
-  onExpExpand = () => {
-    if (this.state.expExpanded) return;
-    this.setState({ expExpanded: true });
-  }
-
-  getSteps = () => {
-    const { context } = this.state;
-    const { scenario } = context || {};
-    return scenarios[scenario] || [];
-  }
-
-  onFinishStep = () => {
-    const { context, expExpanded, step } = this.state;
-    const steps = this.getSteps();
-
-    if (step !== steps.length - 1) {
-      // clear question's inner state
-      this.setState({
-        userNodes: [],
-      }, () => {
-        this.resetStepContext(step + 1);
-      });
+  verifySurvey = () => {
+    const {survey} = this.state;
+    if (survey.mturk_id === null) {
       return;
     }
-
-    const { dataset, scenario } = context;
-
-    const lastEnough = ((new Date()) - this.startTime) > 20000;
-    // const expChecked = expExpanded;
-
-    let survey = null;
-    if (lastEnough) {
-      survey = getSurvey(dataset, scenario);
+    if (survey.gender === null) {
+      return;
+    }
+    for (let i = 0; i < survey.questions.length; i++) {
+      let q = survey.questions[i];
+      if (q.choice === null || q.rating === null) {
+        return;
+      }
     }
 
-    this.setState({
-      step: step + 1,
-      survey
-    });
+    this.onSubmit();
+  }
+
+
+  onSubmit = () => {
+    const { context, survey, submitted } = this.state;
+
+
+    const duration = ((new Date()) - this.startTime);
+
+
+    this.setState({submitted: true});
+    this.showNotification();
   }
 
   showNotification = () => {
     const config = {
       duration: 10,
       message: 'Congratulation!',
-      description: 'You have answered all questions. Now please review our final recommendations customized for you. Then click the "Finish" button in the banner to next step.'
+      description: 'You have answered all questions.'
     };
 
     notification.success(config);
@@ -161,60 +122,42 @@ class Main extends PureComponent {
     notification.warning({
       duration: 10,
       message: 'Attention',
-      description: 'Please rate each feature according to your preference. Your behavior on this page will be recorded, and no token will be given to acquire reward on MTurk if you just randomly assign scores. Thanks!'
+      description: 'Please answer each question based your preference. Your behavior on this page will be recorded, and no token will be given to acquire reward on MTurk if you just randomly assign scores. Thanks!'
     });
   }
 
   render() {
-    const { userNodes, itemNodes, context, survey, step, stepEnd } = this.state;
-    const steps = this.getSteps();
+    const { context, survey, submitted } = this.state;
 
     return (
       <>
         {
-          Boolean(steps.length) && (
-            <Steps current={step} style={{marginBottom: 24}}>
-              {
-                steps.map((_, idx) =>
-                  <Steps.Step key={idx} title={'System ' + String.fromCharCode(65 + idx)} />
-                )
-              }
-              <Steps.Step title="End" />
-            </Steps>
-          )
-        }
-
-        {
-          stepEnd &&
+          submitted &&
             <Alert
-              message="Finish this step"
-              description={(
-                <>
-                  Click the <Button type="danger" onClick={this.onFinishStep}>Finish</Button> to end if you have reviewed the results. Please notice You cannot go back after clicking it.
-                </>
-              )}
+              message="Congratulation!"
+              description="You have successfully completed the survey! Thank you for your participation! You may close this page now."
               type="info"
               showIcon
               style={{marginBottom: 24}}
             />
         }
 
-        <Row gutter={24}>
-          <Col xs={24} sm={24} md={24} lg={9} xl={7}>
-            <Card title={(<><Icon type="question" className={styles.icon} />Questions</>)} style={{marginBottom: 16}}>
-              <QuestionList questions={userNodes} onSubmit={this.onSubmit} />
-            </Card>
-          </Col>
+        {
+          survey && !submitted &&
+            <Row gutter={24}>
+              <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                <Card title={(<><Icon type="user" className={styles.icon} />Participant Infomation</>)} style={{marginBottom: 16}}>
+                  <ParticipantInfo survey={survey} onChange={this.onSurveyChange} />
+                </Card>
 
-          <Col xs={24} sm={24} md={24} lg={15} xl={17}>
-            <Card title={(<><Icon type="heart" className={styles.icon} />Recommendations</>)}>
-              <ItemList items={itemNodes} onExpand={this.onExpExpand} />
-            </Card>
-          </Col>
-        </Row>
+                <Card title={(<><Icon type="question" className={styles.icon} />Questionnaire</>)} style={{marginBottom: 16}}>
+                  <Survey survey={survey} onChange={this.onSurveyChange} />
+                </Card>
+              </Col>
+            </Row>
+        }
 
         <ContextModal visible={!Boolean(context)} onSubmit={this.onContextSubmit} />
-        <SurveyModal visible={step === steps.length} survey={survey} />
       </>
     );
   }

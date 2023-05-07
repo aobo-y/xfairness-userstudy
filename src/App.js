@@ -17,7 +17,7 @@ class App extends Component {
       <Layout className="layout">
         <Header>
           <div className={styles.profile}><Icon type="user" /> {id}</div>
-          <span className={styles.logo}>Explanation Recommendation System</span>
+          <span className={styles.logo}>User Study of Explanation Recommendation System</span>
         </Header>
         <Content className={styles.content}>
           <Main onEnd={this.onEnd} />
