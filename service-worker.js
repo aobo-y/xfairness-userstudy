@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/xrecommendation-userstudy/precache-manifest.ec8a340ae582491f75dd39bf751054d9.js"
+  "/xfairness-userstudy/precache-manifest.f7f77ed616e204dd94ac249898b0941b.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/xrecommendation-userstudy/index.html", {
+workbox.routing.registerNavigationRoute("/xfairness-userstudy/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
