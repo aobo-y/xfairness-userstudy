@@ -1,15 +1,15 @@
 {
-  "main.css": "/xfairness-userstudy/static/css/main.6d7c9eab.chunk.css",
-  "main.js": "/xfairness-userstudy/static/js/main.54853422.chunk.js",
-  "main.js.map": "/xfairness-userstudy/static/js/main.54853422.chunk.js.map",
+  "main.css": "/xfairness-userstudy/static/css/main.515b8416.chunk.css",
+  "main.js": "/xfairness-userstudy/static/js/main.046fa5f0.chunk.js",
+  "main.js.map": "/xfairness-userstudy/static/js/main.046fa5f0.chunk.js.map",
   "static/css/1.d5282b81.chunk.css": "/xfairness-userstudy/static/css/1.d5282b81.chunk.css",
-  "static/js/1.544cd0e1.chunk.js": "/xfairness-userstudy/static/js/1.544cd0e1.chunk.js",
-  "static/js/1.544cd0e1.chunk.js.map": "/xfairness-userstudy/static/js/1.544cd0e1.chunk.js.map",
+  "static/js/1.500311c1.chunk.js": "/xfairness-userstudy/static/js/1.500311c1.chunk.js",
+  "static/js/1.500311c1.chunk.js.map": "/xfairness-userstudy/static/js/1.500311c1.chunk.js.map",
   "runtime~main.js": "/xfairness-userstudy/static/js/runtime~main.f6465cf4.js",
   "runtime~main.js.map": "/xfairness-userstudy/static/js/runtime~main.f6465cf4.js.map",
-  "static/css/main.6d7c9eab.chunk.css.map": "/xfairness-userstudy/static/css/main.6d7c9eab.chunk.css.map",
+  "static/css/main.515b8416.chunk.css.map": "/xfairness-userstudy/static/css/main.515b8416.chunk.css.map",
   "static/css/1.d5282b81.chunk.css.map": "/xfairness-userstudy/static/css/1.d5282b81.chunk.css.map",
   "index.html": "/xfairness-userstudy/index.html",
-  "precache-manifest.f7f77ed616e204dd94ac249898b0941b.js": "/xfairness-userstudy/precache-manifest.f7f77ed616e204dd94ac249898b0941b.js",
+  "precache-manifest.15471b8e4535811f6c0a0f11c409d401.js": "/xfairness-userstudy/precache-manifest.15471b8e4535811f6c0a0f11c409d401.js",
   "service-worker.js": "/xfairness-userstudy/service-worker.js"
 }
