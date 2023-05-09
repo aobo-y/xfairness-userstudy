@@ -65,13 +65,6 @@ const Item = ({
   return (
     <Card title={name}>
       {
-        metadata.map((tag, idx) =>
-          <Tag key={idx} color="blue" style={{marginBottom: 6}}>
-            {tag}
-          </Tag>
-        )
-      }
-      {
         Boolean(exp) && (
           <Collapse defaultActiveKey={["1"]} bordered={false}>
             <Collapse.Panel
@@ -82,6 +75,13 @@ const Item = ({
               <p>{`This item is recommended because: ${exp}`}</p>
             </Collapse.Panel>
           </Collapse>
+        )
+      }
+      {
+        Boolean(metadata) && metadata.map((tag, idx) =>
+          <Tag key={idx} color="blue" style={{marginBottom: 6}}>
+            {tag}
+          </Tag>
         )
       }
       {
@@ -131,13 +131,13 @@ class QuestionItem extends PureComponent {
 
     return (
       <>
-        <p>Q{id + 1}. Please compare the 2 items recommended below and read the explanations of why they are recommended. Then you will asked to choose one of them based your preference.</p>
+        <p>Q{id + 1}. Please compare the 2 items recommended below and read the explanations of why they are recommended. Then you will be asked to choose one of them based your preference.</p>
         <Row gutter={24} style={{marginBottom: 16}}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>
             <Item
               id={items[0].id}
               name={items[0].name}
-              metadata={items[0].metadata}
+              metadata={choice !== null ? items[0].metadata : null}
               exp={items[0].exp}
               review={choice !== null ? items[0].review : null}
             />
@@ -146,7 +146,7 @@ class QuestionItem extends PureComponent {
             <Item
               id={items[1].id}
               name={items[1].name}
-              metadata={items[1].metadata}
+              metadata={choice !== null ? items[1].metadata : null}
               exp={items[1].exp}
               review={choice !== null ? items[1].review : null}
             />
@@ -162,16 +162,18 @@ class QuestionItem extends PureComponent {
         </div>
 
         {
-          choice !== null && <div style={{marginBottom: 16}}>
-            <p>Now, each item is given an additional user review. After reading the reviews, do you think the explanations help you make the right choice:</p>
-            <Radio.Group onChange={this.onRatingChange} value={rating}>
-              <Radio.Button value={5}>Yes</Radio.Button>
-              <Radio.Button value={4}>Somewhat Yes</Radio.Button>
-              <Radio.Button value={3}>Neutral</Radio.Button>
-              <Radio.Button value={2}>Somewhat No</Radio.Button>
-              <Radio.Button value={1}>No</Radio.Button>
-            </Radio.Group>
-          </div>
+          choice !== null && (
+            <div style={{marginBottom: 16}}>
+              <p>Now, additional information and a user review are presented in the items. After reading them, do you think the explanations helped you make the right choice:</p>
+              <Radio.Group onChange={this.onRatingChange} value={rating}>
+                <Radio.Button value={5}>Yes</Radio.Button>
+                <Radio.Button value={4}>Somewhat Yes</Radio.Button>
+                <Radio.Button value={3}>Neutral</Radio.Button>
+                <Radio.Button value={2}>Somewhat No</Radio.Button>
+                <Radio.Button value={1}>No</Radio.Button>
+              </Radio.Group>
+            </div>
+          )
         }
       </>
     );
