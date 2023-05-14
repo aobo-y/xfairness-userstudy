@@ -17,7 +17,7 @@ const port = 3000
 const token = 'f8792bn109_bh32jh989^81'
 
 // db.json file path
-const file = path.join(__dirname, 'db.json')
+const file = path.join(__dirname, `db_${new Date()}.json`)
 
 // Configure lowdb to write data to JSON file
 const defaultData = { surveys: [] }
@@ -32,7 +32,7 @@ app.use(expressId({setHeader: false}))
 app.use(morgan('[:date[iso] #:id] Started :method :url for :remote-addr', {immediate: true}))
 app.use(morgan('[:date[iso] #:id] Completed :status :res[content-length] in :response-time ms'))
 
-app.use('/fairness-userstudy', express.static(path.join(__dirname, '../build')))
+app.use('/fairness-userstudy', express.static(path.join(__dirname, './build')))
 
 app.use(bodyParser.json())
 
