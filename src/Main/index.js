@@ -131,7 +131,7 @@ class Main extends PureComponent {
 
     axios.post('/survey', {
       survey,
-      auth: '',
+      auth: 'f8792bn109_bh32jh989^81',
     }, {timeout: 1000}).then(res => {
       this.setState({submitted: true});
       this.showNotification();

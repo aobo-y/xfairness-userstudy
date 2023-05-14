@@ -9,10 +9,11 @@ import expressId from 'express-request-id'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+var args = process.argv.slice(2);
 
 const app = express()
 
-const port = 3000
+const port = args.length ? args[0] : 80
 
 const token = 'f8792bn109_bh32jh989^81'
 
