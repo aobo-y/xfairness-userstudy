@@ -16,7 +16,7 @@ function format_data(file) {
         'attribute': item.attribute,
         'exp': item.explanation,
         'review': item.review.join(' '),
-        'metadata': item.meta_data.categories.split(', ')
+        'metadata': item.meta_data.categories.split(', ').filter(v => v !== 'Restaurants')
       };
     });
   });
