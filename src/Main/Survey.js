@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 
-import { List } from 'antd';
+import { Card, Icon } from 'antd';
 
 import QuestionItem from './QuestionItem';
+import styles from './index.module.css';
 
 class Survey extends PureComponent {
   static propTypes = {
@@ -11,39 +12,36 @@ class Survey extends PureComponent {
     onChange: PropTypes.func.isRequired
   }
 
-  onChoiceChange = (qid, value) => {
+  onQuestionChange = (qid, key, value) => {
     const { onChange } = this.props;
-    onChange(`questions[${qid}].choice`, value)
-  }
-
-  onRatingChange = (qid, value) => {
-    const { onChange } = this.props;
-    onChange(`questions[${qid}].rating`, value)
+    onChange(`questions[${qid}].${key}`, value)
   }
 
   render() {
     const { survey } = this.props;
-    const questions = survey.questions.filter((q, idx) => idx === 0 || survey.questions[idx-1].rating !== null);
+    const questions = survey.questions.filter((q, idx) => idx === 0 || survey.questions[idx-1].systemRating !== null);
 
     return (
-      <List
-        itemLayout="vertical"
-        size="large"
-        dataSource={questions}
-        rowKey="id"
-        renderItem={(question, idx) => (
-          <List.Item>
+      <>
+        {questions.map((question, idx) => (
+          <Card
+            key={idx}
+            title={(<><Icon type="question" className={styles.icon} />Questionnaire {idx + 1}</>)}
+            style={{marginBottom: 16}}
+          >
             <QuestionItem
               id={idx}
               items={question.items}
               choice={question.choice}
-              rating={question.rating}
-              onChoiceChange={this.onChoiceChange}
-              onRatingChange={this.onRatingChange}
+              choiceRating={question.choiceRating}
+              systemRating={question.systemRating}
+              expRating={question.expRating}
+              expSentiment={question.expSentiment}
+              onChange={this.onQuestionChange}
             />
-          </List.Item>
-        )}
-      />
+          </Card>
+        ))}
+      </>
     );
   }
 }

@@ -14,3 +14,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+p {
+  font-size: 16px;
+}
+
+:global(.ant-radio-group) {
+  font-size: 16px;
+}
+
+:global(.ant-notification-notice-description) {
+  font-size: 16px!important;
+}
+
+:global(.ant-alert) {
+  font-size: 16px;
+}

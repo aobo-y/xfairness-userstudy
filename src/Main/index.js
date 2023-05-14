@@ -12,6 +12,8 @@ import {
   Alert,
 } from 'antd';
 
+import axios from 'axios';
+
 // import QuestionList from './QuestionList';
 // import ItemList from './ItemList';
 import ContextModal from './ContextModal';
@@ -43,13 +45,18 @@ class Main extends PureComponent {
       const dataset = datasets[dataset_key];
       const pairs = _.sampleSize(dataset, QUESTION_NUM);
       const survey = {
+        dataset_key,
         mturk_id: null,
         gender: null,
+        age: null,
         duration: null,
         questions: pairs.map((items, idx) => ({
           items,
           choice: null,
-          rating: null
+          choiceRating: null,
+          systemRating: null,
+          expSentiment: [null, null],
+          expRating: [null, null],
         }))
       }
 
@@ -78,34 +85,65 @@ class Main extends PureComponent {
     })
   }
 
+  verifyQuestion = (q) => {
+    return Object.entries(q).some(([_, val]) => {
+      if (Array.isArray(val)) {
+        return val.some(v => v === null)
+      } else {
+        return val === null
+      }
+    });
+  }
+
   verifySurvey = () => {
     const {survey} = this.state;
-    if (survey.mturk_id === null) {
-      return;
-    }
-    if (survey.gender === null) {
-      return;
+    if (survey.mturk_id === null || survey.gender === null || survey.age === null) {
+      return 'Participant Infomation';
     }
     for (let i = 0; i < survey.questions.length; i++) {
       let q = survey.questions[i];
-      if (q.choice === null || q.rating === null) {
-        return;
+
+      if (this.verifyQuestion(q)) {
+        return `Questionaire ${i + 1}`;
       }
     }
 
-    this.onSubmit();
+    return null;
   }
 
-
   onSubmit = () => {
+    const verifyResult = this.verifySurvey();
+
+    if (verifyResult !== null) {
+      notification.error({
+        duration: 10,
+        message: 'Error',
+        description: `Please complete ${verifyResult} to submit`,
+      });
+
+      return;
+    }
+
     const { context, survey, submitted } = this.state;
-
-
     const duration = ((new Date()) - this.startTime);
 
+    survey.duration = duration;
 
-    this.setState({submitted: true});
-    this.showNotification();
+    axios.post('/survey', {
+      survey,
+      auth: '',
+    }, {timeout: 1000}).then(res => {
+      this.setState({submitted: true});
+      this.showNotification();
+    }).catch(err => {
+      const msg = err.response ? err.response.data : 'Network error';
+
+      notification.error({
+        duration: 10,
+        message: 'Error',
+        description: `${msg}! Please contact us in Mturk.`
+      });
+    });
   }
 
   showNotification = () => {
@@ -120,15 +158,15 @@ class Main extends PureComponent {
 
   showWarning = () => {
     notification.warning({
-      duration: 10,
+      duration: 60,
       message: 'Attention',
-      description: 'Please answer each question based your preference. Your behavior on this page will be recorded, and no token will be given to acquire reward on MTurk if you just randomly assign scores. Thanks!'
+      description: 'Welcome to our study! The purpose of this study is to test the effectiveness of a recommendation explanation system. You will be presented with two items and make a choice based on the explanations provided. Afterward, we will provide you with additional information and real user reviews about the items to evaluate the effectiveness of the explanations. Please note that there is no correct or wrong answer to the questions. Simply use your best judgment when answering the questions.'
     });
   }
 
   render() {
     const { context, survey, submitted } = this.state;
-
+    console.log(!Boolean(context))
     return (
       <>
         {
@@ -141,18 +179,19 @@ class Main extends PureComponent {
               style={{marginBottom: 24}}
             />
         }
-
         {
           survey && !submitted &&
             <Row gutter={24}>
               <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                <Card title={(<><Icon type="user" className={styles.icon} />Participant Infomation</>)} style={{marginBottom: 16}}>
+                <Card title={(<><Icon type="user" className={styles.icon} />Participant Infomation</>)} style={{marginBottom: 20}}>
                   <ParticipantInfo survey={survey} onChange={this.onSurveyChange} />
                 </Card>
 
-                <Card title={(<><Icon type="question" className={styles.icon} />Questionnaire</>)} style={{marginBottom: 16}}>
-                  <Survey survey={survey} onChange={this.onSurveyChange} />
-                </Card>
+                <Survey survey={survey} onChange={this.onSurveyChange} />
+
+                <Button type="primary" size="large" onClick={this.onSubmit}>
+                  Submit
+                </Button>
               </Col>
             </Row>
         }

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.12.1",
+    "axios": "^1.4.0",
     "lodash": "^4.17.11",
     "mathjs": "^5.4.0",
     "query-string": "^6.2.0",
@@ -30,7 +31,7 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "homepage": "https://aobo-y.github.io/xfairness-userstudy/",
+  "homepage": "/fairness-userstudy",
   "devDependencies": {
     "gh-pages": "^2.0.1",
     "yelp-fusion": "^2.2.1"
