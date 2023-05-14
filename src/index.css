@@ -27,6 +27,7 @@ p {
   font-size: 16px!important;
 }
 
-:global(.ant-alert) {
+:global(.ant-alert),
+:global(.ant-alert-description) {
   font-size: 16px;
 }

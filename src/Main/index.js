@@ -64,7 +64,7 @@ class Main extends PureComponent {
         context: {dataset_key},
         survey,
       }, () => {
-        this.showWarning();
+        // this.showWarning();
         this.startTime = new Date();
       });
     }
@@ -174,26 +174,45 @@ class Main extends PureComponent {
             <Alert
               message="Congratulation!"
               description="You have successfully completed the survey! Thank you for your participation! You may close this page now."
-              type="info"
+              type="success"
               showIcon
               style={{marginBottom: 24}}
             />
         }
         {
           survey && !submitted &&
-            <Row gutter={24}>
-              <Col xs={24} sm={24} md={24} lg={24} xl={24}>
-                <Card title={(<><Icon type="user" className={styles.icon} />Participant Infomation</>)} style={{marginBottom: 20}}>
-                  <ParticipantInfo survey={survey} onChange={this.onSurveyChange} />
-                </Card>
+            <>
+              <Alert
+                message="Welcome to our study!"
+                description={
+                  <>
+                    {`The purpose of this study is to evaluate the effectiveness of a recommendation explanation generation system. You will need to complete ${QUESTION_NUM} independent questionnaires. Each questionnaire contains the following three steps.`}
+                    <ol>
+                      <li>You will be presented with two recommended items and the generated explanations for the recommendations. Please make a choice based on the explanations.</li>
+                      <li>You will be asked questions to evaluate the quality of the explanations from different perspectives.</li>
+                      <li>We will provide you with additional information and real user reviews about the items to evaluate the effectiveness of the explanations.</li>
+                    </ol>
+                    Please note that there is no correct or wrong answer to the questions. Simply use your best judgment when answering the questions.
+                  </>
+                }
+                type="info"
+                showIcon
+                style={{marginBottom: 24}}
+              />
+              <Row gutter={24}>
+                <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                  <Card title={(<><Icon type="user" className={styles.icon} />Participant Infomation</>)} style={{marginBottom: 20}}>
+                    <ParticipantInfo survey={survey} onChange={this.onSurveyChange} />
+                  </Card>
 
-                <Survey survey={survey} onChange={this.onSurveyChange} />
+                  <Survey survey={survey} onChange={this.onSurveyChange} />
 
-                <Button type="primary" size="large" onClick={this.onSubmit}>
-                  Submit
-                </Button>
-              </Col>
-            </Row>
+                  <Button type="primary" size="large" onClick={this.onSubmit}>
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </>
         }
 
         <ContextModal visible={!Boolean(context)} onSubmit={this.onContextSubmit} />
