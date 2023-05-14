@@ -17,7 +17,7 @@ const port = 3000
 const token = 'f8792bn109_bh32jh989^81'
 
 // db.json file path
-const file = path.join(__dirname, `db_${new Date()}.json`)
+const file = path.join(__dirname, `db_${new Date().getTime}.json`)
 
 // Configure lowdb to write data to JSON file
 const defaultData = { surveys: [] }
