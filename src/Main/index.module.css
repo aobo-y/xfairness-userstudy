@@ -2,3 +2,9 @@
   margin-right: 6px;
   color: #1890ff;
 }
+
+.section {
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 1px solid #e8e8e8;
+}

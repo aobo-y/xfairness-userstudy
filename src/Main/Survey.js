@@ -26,7 +26,7 @@ class Survey extends PureComponent {
         {questions.map((question, idx) => (
           <Card
             key={idx}
-            title={(<><Icon type="question" className={styles.icon} />Questionnaire {idx + 1}</>)}
+            title={(<><Icon type="solution" className={styles.icon} />Questionnaire {idx + 1}</>)}
             style={{marginBottom: 16}}
           >
             <QuestionItem

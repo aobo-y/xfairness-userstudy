@@ -2,56 +2,24 @@ import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Tag, Radio, Button, Collapse, Icon, Row, Col } from 'antd';
 
-import InputSlider from './InputSlider';
+import styles from './index.module.css';
 
-const SliderAnswer = ({
+const RadioQuestion = ({
+  text,
   value,
-  submitted,
+  options,
   onChange,
-  onConfirm,
-  onUnknown
 }) => {
-  if (submitted) {
-    return <p>Answer: <strong>{value < 0 ? 'Don\'t know' : value}</strong></p>
-  }
-
   return (
-    <>
-      <InputSlider value={value} onChange={onChange} />
-      <Button type="primary" onClick={onConfirm}>Confirm</Button>
-      <Button style={{marginLeft: 10}} onClick={onUnknown}>I don't Know</Button>
-    </>
-  );
-}
-
-
-const RadioAnswer = ({
-  value,
-  submitted,
-  onLike,
-  onDislike,
-  onUnknown
-}) => {
-  if (submitted) {
-    let answer;
-    if (value === 0) {
-      answer = 'Dislike';
-    } else if (value > 0) {
-      answer = 'Like';
-    } else {
-      answer = 'Don\'t know';
-    }
-
-    return <p>Answer: <strong>{answer}</strong></p>
-   }
-
-   return (
-    <>
-      <Button type="primary" onClick={onLike}>Like</Button>
-      <Button type="primary" style={{marginLeft: 10}} onClick={onDislike}>Dislike</Button>
-      <Button style={{marginLeft: 10}} onClick={onUnknown}>I don't Know</Button>
-    </>
-  );
+    <div style={{marginBottom: 16}}>
+      <p><Icon type="question-circle" className={styles.icon} />{text}</p>
+      <Radio.Group onChange={onChange} value={value}>
+        {options.map(([t, v]) => (
+          <Radio.Button id={v} value={v}>{t}</Radio.Button>
+        ))}
+      </Radio.Group>
+    </div>
+  )
 }
 
 
@@ -147,7 +115,7 @@ class QuestionItem extends Component {
 
     return (
       <>
-        <p>Please compare the two restaurants recommended below. You are expected to judge the quality of the restaurants based on the provided explanations and choose the one that is better.</p>
+        <p>Please compare the two restaurants recommended below. You need to judge the quality of the restaurants based on the provided explanations and choose the one that is better.</p>
         <Row gutter={24} style={{marginBottom: 16}}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>
             <Item
@@ -165,38 +133,45 @@ class QuestionItem extends Component {
           </Col>
         </Row>
 
-        <div style={{marginBottom: 16}}>
-          <p>{'Choose the item you like more (please note you cannot change this answer once selected):'}</p>
-          <Radio.Group onChange={this.onChoiceChange} value={choice}>
-            <Radio.Button value={0}>1. {items[0].name}</Radio.Button>
-            <Radio.Button value={1}>2. {items[1].name}</Radio.Button>
-          </Radio.Group>
-        </div>
+        <RadioQuestion
+          text='Choose the item you like more (please note you cannot change this answer once selected):'
+          value={choice}
+          onChange={this.onChoiceChange}
+          options={[
+            [`1. ${items[0].name}`, 0],
+            [`2. ${items[1].name}`, 1],
+          ]}
+        />
 
         {
           itemsToShow.map((item, idx) => (
-            <div key={idx}>
-              <p>{`The following 2 questions are for the explanation of Item ${idx + 1} (${item.name}): ${item.exp}`}</p>
-              <div style={{marginBottom: 16}}>
-                <p>{'Please rate the sentiment of the explanation:'}</p>
-                <Radio.Group onChange={this.onRadioChange.bind(this, `expSentiment[${idx}]`)} value={expSentiment[idx]}>
-                <Radio.Button value={5}>Very Positive</Radio.Button>
-                  <Radio.Button value={4}>Positive</Radio.Button>
-                  <Radio.Button value={3}>Neutral</Radio.Button>
-                  <Radio.Button value={2}>Negative</Radio.Button>
-                  <Radio.Button value={1}>Very Negative</Radio.Button>
-                </Radio.Group>
-              </div>
-              <div style={{marginBottom: 16}}>
-                <p>{'Do you think the explanation is helpful for you to understand why the restaurant is recommended:'}</p>
-                <Radio.Group onChange={this.onRadioChange.bind(this, `expRating[${idx}]`)} value={expRating[idx]}>
-                  <Radio.Button value={5}>Yes</Radio.Button>
-                  <Radio.Button value={4}>Somewhat Yes</Radio.Button>
-                  <Radio.Button value={3}>Neutral</Radio.Button>
-                  <Radio.Button value={2}>Somewhat No</Radio.Button>
-                  <Radio.Button value={1}>No</Radio.Button>
-                </Radio.Group>
-              </div>
+            <div key={idx} className={styles.section}>
+              <p>The following <b>2</b> questions are for evaluating the explanation of item <b>{item.name}</b></p>
+              <p>Explanation: <b>{item.exp}</b></p>
+              <RadioQuestion
+                text='Please rate the sentiment of the explanation:'
+                value={expSentiment[idx]}
+                onChange={this.onRadioChange.bind(this, `expSentiment[${idx}]`)}
+                options={[
+                  ['Very Positive', 5],
+                  ['Positive', 4],
+                  ['Neutral', 3],
+                  ['Negative', 2],
+                  ['Very Negative', 1],
+                ]}
+              />
+              <RadioQuestion
+                text='Do you think the explanation is helpful for you to understand why the restaurant is recommended:'
+                value={expRating[idx]}
+                onChange={this.onRadioChange.bind(this, `expRating[${idx}]`)}
+                options={[
+                  ['Yes', 5],
+                  ['Somewhat Yes', 4],
+                  ['Neutral', 3],
+                  ['Somewhat No', 2],
+                  ['No', 1],
+                ]}
+              />
             </div>
           ))
         }
@@ -204,7 +179,7 @@ class QuestionItem extends Component {
 
         {
           showReview && (
-            <>
+            <div className={styles.section}>
               <p>Now, additional information and a user review are presented in the items.</p>
               <Row gutter={24} style={{marginBottom: 16}}>
                 <Col xs={24} sm={24} md={12} lg={12} xl={12}>
@@ -224,24 +199,28 @@ class QuestionItem extends Component {
                   />
                 </Col>
               </Row>
-              <div style={{marginBottom: 16}}>
-                <p>Based on our additionally provided information and the real user reviews about the recommended restaurants, do you think you made the right choice at the beginning, based on the explanations?</p>
-                <Radio.Group onChange={this.onChoiceRatingChange} value={choiceRating}>
-                  <Radio.Button value={1}>Yes</Radio.Button>
-                  <Radio.Button value={0}>No</Radio.Button>
-                </Radio.Group>
-              </div>
-              <div style={{marginBottom: 16}}>
-                <p>Are you satisfied with our recommendation-explanation system?</p>
-                <Radio.Group onChange={this.onSystemRatingChange} value={systemRating}>
-                  <Radio.Button value={5}>Yes</Radio.Button>
-                  <Radio.Button value={4}>Somewhat Yes</Radio.Button>
-                  <Radio.Button value={3}>Neutral</Radio.Button>
-                  <Radio.Button value={2}>Somewhat No</Radio.Button>
-                  <Radio.Button value={1}>No</Radio.Button>
-                </Radio.Group>
-              </div>
-            </>
+              <RadioQuestion
+                text='Based on our additionally provided information and the real user reviews about the recommended restaurants, do you think you made the right choice at the beginning, based on the explanations?'
+                value={choiceRating}
+                onChange={this.onRadioChange.bind(this, 'choiceRating')}
+                options={[
+                  ['Yes', 1],
+                  ['No', 0],
+                ]}
+              />
+              <RadioQuestion
+                text='Are you satisfied with our recommendation-explanation system?'
+                value={systemRating}
+                onChange={this.onRadioChange.bind(this, 'systemRating')}
+                options={[
+                  ['Yes', 5],
+                  ['Somewhat Yes', 4],
+                  ['Neutral', 3],
+                  ['Somewhat No', 2],
+                  ['No', 1],
+                ]}
+              />
+            </div>
           )
         }
       </>
