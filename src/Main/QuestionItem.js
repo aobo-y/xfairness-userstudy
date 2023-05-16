@@ -142,7 +142,7 @@ class QuestionItem extends Component {
         {
           itemsToShow.map((item, idx) => (
             <div key={idx} className={styles.section}>
-              <p>The following <b>2</b> questions are for evaluating the explanation of item <b>{item.name}</b></p>
+              <p>The following questions are for evaluating the explanation of item <b>{item.name}</b></p>
               <p>Explanation: <b>{item.exp}</b></p>
               <RadioQuestion
                 text='Please rate the sentiment of the explanation:'
