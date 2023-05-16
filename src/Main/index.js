@@ -57,6 +57,8 @@ class Main extends PureComponent {
           systemRating: null,
           expSentiment: [null, null],
           expRating: [null, null],
+          expInfomativeness: [null, null],
+          expDetailedness: [null, null],
         }))
       }
 
@@ -166,7 +168,7 @@ class Main extends PureComponent {
 
   render() {
     const { context, survey, submitted } = this.state;
-    console.log(!Boolean(context))
+
     return (
       <>
         {
@@ -195,6 +197,13 @@ class Main extends PureComponent {
                     Please note that there is no correct or wrong answer to the questions. Simply use your best judgment when answering the questions.
                   </>
                 }
+                type="info"
+                showIcon
+                style={{marginBottom: 24}}
+              />
+              <Alert
+                message="Attention"
+                description='Your behavior on this questionnaire will be recorded for quality control. Please answer the questions thoughtfully and carefully to receive the full reward.'
                 type="info"
                 showIcon
                 style={{marginBottom: 24}}

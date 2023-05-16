@@ -1,6 +1,6 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Tag, Radio, Button, Collapse, Icon, Row, Col } from 'antd';
+import { Card, Tag, Radio, Icon, Row, Col } from 'antd';
 
 import styles from './index.module.css';
 
@@ -15,7 +15,7 @@ const RadioQuestion = ({
       <p><Icon type="question-circle" className={styles.icon} />{text}</p>
       <Radio.Group onChange={onChange} value={value}>
         {options.map(([t, v]) => (
-          <Radio.Button id={v} value={v}>{t}</Radio.Button>
+          <Radio.Button key={v} value={v}>{t}</Radio.Button>
         ))}
       </Radio.Group>
     </div>
@@ -50,6 +50,7 @@ const Item2 = ({
 }) => {
   return (
     <Card title={name}>
+      Attributes:
       {
         Boolean(metadata) && metadata.map((tag, idx) =>
           <Tag key={idx} color="blue" style={{marginBottom: 6}}>
@@ -73,6 +74,7 @@ class QuestionItem extends Component {
   static propTypes = {
     id: PropTypes.number.isRequired,
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
+    itemName: PropTypes.string,
     choice: PropTypes.number,
     choiceRating: PropTypes.number,
     systemRating: PropTypes.number,
@@ -81,41 +83,35 @@ class QuestionItem extends Component {
 
   static defaultProps = {
     choice: null,
-    rating: null
-  }
-
-  onChoiceChange = e => {
-    const {id, choice, onChange} = this.props;
-    if (choice === null) {
-      onChange(id, 'choice', e.target.value)
-    }
-  }
-
-  onChoiceRatingChange = e => {
-    const {id, onChange} = this.props;
-    onChange(id, 'choiceRating', e.target.value)
-  }
-
-  onSystemRatingChange = e => {
-    const {id, onChange} = this.props;
-    onChange(id, 'systemRating', e.target.value)
+    rating: null,
+    itemName: 'restaurant',
   }
 
   onRadioChange = (key, e) => {
     const {id, onChange} = this.props;
-    console.log(key)
     onChange(id, key, e.target.value)
   }
 
   render() {
-    const {id, items, choice, choiceRating, systemRating, expSentiment, expRating} = this.props;
+    const {
+      id,
+      itemName,
+      items,
+      choice,
+      choiceRating,
+      systemRating,
+      expSentiment,
+      expRating,
+      expInfomativeness,
+      expDetailedness,
+    } = this.props;
 
     const itemsToShow = items.filter((item, idx) => idx === 0 ? choice !== null : expRating[idx - 1])
     const showReview = expRating[1] !== null;
 
     return (
       <>
-        <p>Please compare the two restaurants recommended below. You need to judge the quality of the restaurants based on the provided explanations and choose the one that is better.</p>
+        <p>Please compare the two restaurants recommended below. You need to judge the quality of the restaurants based on the provided explanations.</p>
         <Row gutter={24} style={{marginBottom: 16}}>
           <Col xs={24} sm={24} md={12} lg={12} xl={12}>
             <Item
@@ -134,9 +130,9 @@ class QuestionItem extends Component {
         </Row>
 
         <RadioQuestion
-          text='Choose the item you like more (please note you cannot change this answer once selected):'
+          text={`Choose the ${itemName} you think is better (please note you cannot change this answer once selected):`}
           value={choice}
-          onChange={this.onChoiceChange}
+          onChange={this.onRadioChange.bind(this, 'choice')}
           options={[
             [`1. ${items[0].name}`, 0],
             [`2. ${items[1].name}`, 1],
@@ -161,7 +157,31 @@ class QuestionItem extends Component {
                 ]}
               />
               <RadioQuestion
-                text='Do you think the explanation is helpful for you to understand why the restaurant is recommended:'
+                text='Please rate the informativeness of the explanation (scale 1-5):'
+                value={expInfomativeness[idx]}
+                onChange={this.onRadioChange.bind(this, `expInfomativeness[${idx}]`)}
+                options={[
+                  ['5', 5],
+                  ['4', 4],
+                  ['3', 3],
+                  ['2', 2],
+                  ['1', 1],
+                ]}
+              />
+              <RadioQuestion
+                text='Please rate the detailedness of the explanation (scale 1-5):'
+                value={expDetailedness[idx]}
+                onChange={this.onRadioChange.bind(this, `expDetailedness[${idx}]`)}
+                options={[
+                  ['5', 5],
+                  ['4', 4],
+                  ['3', 3],
+                  ['2', 2],
+                  ['1', 1],
+                ]}
+              />
+              <RadioQuestion
+                text='Do you think the explanation is helpful for you to get some ideas about the restaurant?'
                 value={expRating[idx]}
                 onChange={this.onRadioChange.bind(this, `expRating[${idx}]`)}
                 options={[
@@ -180,7 +200,7 @@ class QuestionItem extends Component {
         {
           showReview && (
             <div className={styles.section}>
-              <p>Now, additional information and a user review are presented in the items.</p>
+              <p>{`Now, additional information and a real user review are presented for the ${itemName}s.`}</p>
               <Row gutter={24} style={{marginBottom: 16}}>
                 <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                   <Item2
@@ -209,7 +229,7 @@ class QuestionItem extends Component {
                 ]}
               />
               <RadioQuestion
-                text='Are you satisfied with our recommendation-explanation system?'
+                text='In general, are you satisfied with the recommendation-explanation system?'
                 value={systemRating}
                 onChange={this.onRadioChange.bind(this, 'systemRating')}
                 options={[
