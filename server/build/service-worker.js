@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/fairness-userstudy/precache-manifest.1767fcbbb2d40cf70dfde66e98f5eb40.js"
+  "/fairness-userstudy/precache-manifest.4d6af459d1879c61385a50e403ff9ed6.js"
 );
 
 workbox.clientsClaim();
