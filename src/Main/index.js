@@ -10,40 +10,44 @@ import {
   Row,
   Col,
   Alert,
+  Spin,
 } from 'antd';
 
 import axios from 'axios';
 
-// import QuestionList from './QuestionList';
-// import ItemList from './ItemList';
 import ContextModal from './ContextModal';
 import Survey from './Survey';
 import ParticipantInfo from './ParticipantInfo';
-// import SurveyModal from './SurveyModal';
-
-import datasets from '../lib/dataset';
 
 import styles from './index.module.css';
 
-const QUESTION_NUM = 2;
+
+const attentionMath = [
+  ['two', 'one', 3],
+  ['one', 'zero', 1],
+  ['four', 'one', 5],
+  ['one', 'three', 4],
+  ['three', 'two', 5],
+]
 
 class Main extends PureComponent {
   state = {
     context: null,
     survey: null,
     submitted: false,
+    loading: false,
   }
 
   componentDidMount() {
-    this.setContext();
+    this.setContext()
   }
 
   setContext = () => {
     let {dataset_key} = qs.parse(window.location.search);
 
-    if (dataset_key && dataset_key in datasets) {
-      const dataset = datasets[dataset_key];
-      const pairs = _.sampleSize(dataset, QUESTION_NUM);
+    axios.get(`/context/${dataset_key}`, {timeout: 1000}).then(res => {
+      console.log(res.data)
+      const pairs = res.data
       const survey = {
         dataset_key,
         mturk_id: null,
@@ -59,6 +63,7 @@ class Main extends PureComponent {
           expRating: [null, null],
           expInfomativeness: [null, null],
           expDetailedness: [null, null],
+          attn: {q: _.sample(attentionMath), a: null}
         }))
       }
 
@@ -69,7 +74,27 @@ class Main extends PureComponent {
         // this.showWarning();
         this.startTime = new Date();
       });
-    }
+    }).catch(err => {
+      if (err.response.status === 400) {
+        notification.error({
+          duration: 10,
+          message: 'Error',
+          description: `Invalid context: ${dataset_key}`
+        });
+      } else {
+        const msg = err.response ? err.response.data : 'Network error';
+
+        notification.error({
+          duration: 10,
+          message: 'Error',
+          description: `${msg}! Please contact us in Mturk.`
+        });
+      }
+    }).finally(() => {
+      this.setState({loading: false})
+    });
+
+    this.setState({loading: true})
   }
 
   onContextSubmit = context => {
@@ -126,7 +151,8 @@ class Main extends PureComponent {
       return;
     }
 
-    const { context, survey, submitted } = this.state;
+    const { survey } = this.state;
+
     const duration = ((new Date()) - this.startTime);
 
     survey.duration = duration;
@@ -144,8 +170,12 @@ class Main extends PureComponent {
         duration: 10,
         message: 'Error',
         description: `${msg}! Please contact us in Mturk.`
-      });
+      })
+    }).finally(() => {
+      this.setState({loading: false})
     });
+
+    this.setState({loading: true})
   }
 
   showNotification = () => {
@@ -167,7 +197,7 @@ class Main extends PureComponent {
   }
 
   render() {
-    const { context, survey, submitted } = this.state;
+    const { context, survey, submitted, loading } = this.state;
 
     return (
       <>
@@ -181,6 +211,7 @@ class Main extends PureComponent {
               style={{marginBottom: 24}}
             />
         }
+        {loading && <Spin size="large" />}
         {
           survey && !submitted &&
             <>
@@ -188,7 +219,7 @@ class Main extends PureComponent {
                 message="Welcome to our study!"
                 description={
                   <>
-                    {`The purpose of this study is to evaluate the effectiveness of a recommendation explanation generation system. You will need to complete ${QUESTION_NUM} independent questionnaires. Each questionnaire contains the following three steps.`}
+                    The purpose of this study is to evaluate the effectiveness of a recommendation explanation generation system. You will need to complete a questionnaire which contains the following three steps.
                     <ol>
                       <li>You will be presented with two recommended items and the generated explanations for the recommendations. Please make a choice based on the explanations.</li>
                       <li>You will be asked questions to evaluate the quality of the explanations from different perspectives.</li>
@@ -203,7 +234,12 @@ class Main extends PureComponent {
               />
               <Alert
                 message="Attention"
-                description='Your behavior on this questionnaire will be recorded for quality control. Please answer the questions thoughtfully and carefully to receive the full reward.'
+                description={
+                  <>
+                    <b>Random answers will be rejected. </b>
+                    Your behavior on this questionnaire is recorded for quality control. Please answer the questions thoughtfully and carefully to receive the full reward.
+                  </>
+                }
                 type="info"
                 showIcon
                 style={{marginBottom: 24}}
@@ -216,7 +252,7 @@ class Main extends PureComponent {
 
                   <Survey survey={survey} onChange={this.onSurveyChange} />
 
-                  <Button type="primary" size="large" onClick={this.onSubmit}>
+                  <Button type="primary" size="large" onClick={this.onSubmit} disabled={loading}>
                     Submit
                   </Button>
                 </Col>
@@ -224,7 +260,7 @@ class Main extends PureComponent {
             </>
         }
 
-        <ContextModal visible={!Boolean(context)} onSubmit={this.onContextSubmit} />
+        {/* <ContextModal visible={!Boolean(context)} onSubmit={this.onContextSubmit} /> */}
       </>
     );
   }

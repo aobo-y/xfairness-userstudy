@@ -31,3 +31,8 @@ p {
 :global(.ant-alert-description) {
   font-size: 16px;
 }
+
+:global(.ant-radio-button-wrapper) {
+  text-align: center;
+  min-width: 85px;
+}

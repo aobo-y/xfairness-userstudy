@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/fairness-userstudy/precache-manifest.2bfc90e45944acfdf48bde6377b1ae93.js"
+  "/xfairness-userstudy/precache-manifest.36c10a40d95c0c87f45d1a79aa06187c.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/fairness-userstudy/index.html", {
+workbox.routing.registerNavigationRoute("/xfairness-userstudy/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });

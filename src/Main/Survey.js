@@ -39,6 +39,7 @@ class Survey extends PureComponent {
               expSentiment={question.expSentiment}
               expInfomativeness={question.expInfomativeness}
               expDetailedness={question.expDetailedness}
+              attn={question.attn}
               onChange={this.onQuestionChange}
             />
           </Card>

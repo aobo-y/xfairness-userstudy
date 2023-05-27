@@ -21,7 +21,7 @@ function format_data(file) {
     });
   });
 
-  fs.writeFileSync(path.join(__dirname, `../src/data/${file}.json`), JSON.stringify(data));
+  fs.writeFileSync(path.join(__dirname, `../server/data/${file}.json`), JSON.stringify(data));
 }
 
 format_data(file);

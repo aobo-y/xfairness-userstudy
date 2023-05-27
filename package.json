@@ -31,9 +31,10 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "homepage": "/fairness-userstudy",
+  "homepage": "/xfairness-userstudy",
   "devDependencies": {
     "gh-pages": "^2.0.1",
     "yelp-fusion": "^2.2.1"
-  }
+  },
+  "proxy": "http://localhost"
 }

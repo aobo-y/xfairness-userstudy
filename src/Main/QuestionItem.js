@@ -1,8 +1,10 @@
 import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Tag, Radio, Icon, Row, Col } from 'antd';
+import * as _ from 'lodash';
 
 import styles from './index.module.css';
+
 
 const RadioQuestion = ({
   text,
@@ -104,6 +106,7 @@ class QuestionItem extends Component {
       expRating,
       expInfomativeness,
       expDetailedness,
+      attn,
     } = this.props;
 
     const itemsToShow = items.filter((item, idx) => idx === 0 ? choice !== null : expRating[idx - 1])
@@ -149,47 +152,47 @@ class QuestionItem extends Component {
                 value={expSentiment[idx]}
                 onChange={this.onRadioChange.bind(this, `expSentiment[${idx}]`)}
                 options={[
-                  ['Very Positive', 5],
-                  ['Positive', 4],
-                  ['Neutral', 3],
-                  ['Negative', 2],
                   ['Very Negative', 1],
+                  ['Negative', 2],
+                  ['Neutral', 3],
+                  ['Positive', 4],
+                  ['Very Positive', 5],
                 ]}
               />
               <RadioQuestion
-                text='Please rate the informativeness of the explanation (scale 1-5):'
+                text='Is the explanation informative:'
                 value={expInfomativeness[idx]}
                 onChange={this.onRadioChange.bind(this, `expInfomativeness[${idx}]`)}
                 options={[
-                  ['5', 5],
-                  ['4', 4],
-                  ['3', 3],
-                  ['2', 2],
-                  ['1', 1],
+                  ['Not at all', 1],
+                  ['Somewhat', 2],
+                  ['Moderate', 3],
+                  [' Very ', 4],
+                  ['Extremely', 5],
                 ]}
               />
               <RadioQuestion
-                text='Please rate the detailedness of the explanation (scale 1-5):'
+                text='Is the explanation detailed:'
                 value={expDetailedness[idx]}
                 onChange={this.onRadioChange.bind(this, `expDetailedness[${idx}]`)}
                 options={[
-                  ['5', 5],
-                  ['4', 4],
-                  ['3', 3],
-                  ['2', 2],
-                  ['1', 1],
+                  ['Not at all', 1],
+                  ['Somewhat', 2],
+                  ['Moderate', 3],
+                  [' Very ', 4],
+                  ['Extremely', 5],
                 ]}
               />
               <RadioQuestion
-                text='Do you think the explanation is helpful for you to get some ideas about the restaurant?'
+                text='Is the explanation helpful for you to get some ideas about the restaurant?'
                 value={expRating[idx]}
                 onChange={this.onRadioChange.bind(this, `expRating[${idx}]`)}
                 options={[
-                  ['Yes', 5],
-                  ['Somewhat Yes', 4],
-                  ['Neutral', 3],
-                  ['Somewhat No', 2],
-                  ['No', 1],
+                  ['Not at all', 1],
+                  ['Somewhat', 2],
+                  ['Moderate', 3],
+                  [' Very ', 4],
+                  ['Extremely', 5],
                 ]}
               />
             </div>
@@ -229,15 +232,27 @@ class QuestionItem extends Component {
                 ]}
               />
               <RadioQuestion
+                text={`What is the result of ${attn.q[0]} plus ${attn.q[1]}?`}
+                value={attn.a}
+                onChange={this.onRadioChange.bind(this, 'attn.a')}
+                options={[
+                  ['One', 1],
+                  ['Two', 2],
+                  ['Three', 3],
+                  ['Four', 4],
+                  ['Five', 5],
+                ]}
+              />
+              <RadioQuestion
                 text='In general, are you satisfied with the recommendation-explanation system?'
                 value={systemRating}
                 onChange={this.onRadioChange.bind(this, 'systemRating')}
                 options={[
-                  ['Yes', 5],
-                  ['Somewhat Yes', 4],
-                  ['Neutral', 3],
-                  ['Somewhat No', 2],
-                  ['No', 1],
+                  ['Not at all', 1],
+                  ['Somewhat', 2],
+                  ['Moderate', 3],
+                  [' Very ', 4],
+                  ['Extremely', 5],
                 ]}
               />
             </div>
